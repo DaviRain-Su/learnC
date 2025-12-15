@@ -2,9 +2,10 @@
 #include "foo.h"
 
 int main() {
-    int c = 0;
-    while ((c = getchar()) != EOF) {
-        putchar(c);
+    int nc = 0;
+    while (getchar() != EOF) {
+        nc += 1;
     }
+    printf("\nINPUT NUMBERIS: %ld\n", nc);
     return 0;
 }

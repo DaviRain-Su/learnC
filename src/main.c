@@ -1,13 +1,14 @@
 #include <stdio.h>
 #include "foo.h"
 
+#define MAX_FAHRENHEIT 300
+#define STEP 20
+
 // 函数原型声明
 void display_fahrenheit_convert_with_celsius(int fahrenheit);
 
 int main() {
-    int upper = 300;
-    int step = 20;
-    for (int fahr = 0; fahr <= upper; fahr += step) {
+    for (int fahr = 0; fahr <= MAX_FAHRENHEIT; fahr += STEP) {
         display_fahrenheit_convert_with_celsius(fahr);
     }
     return 0;

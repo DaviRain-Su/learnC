@@ -12,7 +12,7 @@ pub fn build(b: *std.Build) void {
         .root_module = b.createModule(.{
             .target = target,
             .optimize = optimize,
-            .link_libc = true,  // 链接 C 标准库
+            .link_libc = true, // 链接 C 标准库
         }),
     });
 
@@ -23,9 +23,9 @@ pub fn build(b: *std.Build) void {
             "src/foo.c",
         },
         .flags = &.{
-            "-Wall",      // 开启所有警告
-            "-Wextra",    // 开启额外警告
-            "-std=c11",   // 使用 C11 标准
+            "-Wall", // 开启所有警告
+            "-Wextra", // 开启额外警告
+            "-std=c11", // 使用 C11 标准
         },
     });
 
@@ -47,4 +47,8 @@ pub fn build(b: *std.Build) void {
     // 创建 "zig build run" 步骤
     const run_step = b.step("run", "Run the application");
     run_step.dependOn(&run_cmd.step);
+
+    // 创建 "check" 步骤供 ZLS 使用 (用于头文件查找和语法检查)
+    const check_step = b.step("check", "Check compilation");
+    check_step.dependOn(&exe.step);
 }

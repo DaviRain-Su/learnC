@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "foo.h"
+
 
 int main() {
     int nc = 0;
@@ -10,7 +10,7 @@ int main() {
         }
         c = getchar();
     }
-    printf("\nINPUT NUMBERIS: %ld\n", nc);
-    printf("\nINPUT LINEIS: %ld\n", nl);
+    printf("\nINPUT NUMBERIS: %d\n", nc);
+    printf("\nINPUT LINEIS: %d\n", nl);
     return 0;
 }

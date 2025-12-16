@@ -21,3 +21,16 @@ func isValid(s string) bool {
 	}
 	return len(stack) == 0
 }
+
+func removeElement(nums []int, val int) int {
+    l := 0;
+    r := 0;
+    for r < len(nums) {
+        if nums[r] != val {
+            nums[l] = nums[r];
+            l += 1;
+        }
+        r += 1;
+    }
+    return l;
+}

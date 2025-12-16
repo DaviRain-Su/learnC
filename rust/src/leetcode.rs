@@ -32,3 +32,26 @@ fn test_is_valid() {
     assert_eq!(is_valid("([)]".to_string()), false);
     assert_eq!(is_valid("{[]}".to_string()), true);
 }
+
+pub fn remove_element(nums: &mut Vec<i32>, val: i32) -> i32 {
+    let mut l = 0;
+    let mut r = 0;
+    while r < nums.len() {
+        if nums[r] != val {
+            nums[l] = nums[r];
+            l += 1;
+        }
+        r += 1;
+    }
+    l as i32
+}
+
+#[test]
+fn test_remove_element() {
+    let mut nums = vec![3, 2, 2, 3];
+    let val = 3;
+    let expected = 2;
+    let actual = remove_element(&mut nums, val);
+    assert_eq!(actual, expected);
+    assert_eq!(nums, vec![2, 2]);
+}

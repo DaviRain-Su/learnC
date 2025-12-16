@@ -12,7 +12,7 @@ pub fn build(b: *std.Build) void {
         .root_module = b.createModule(.{
             .target = target,
             .optimize = optimize,
-            .link_libc = true,  // 链接 C 标准库
+            .link_libc = true, // 链接 C 标准库
         }),
     });
 
@@ -23,9 +23,9 @@ pub fn build(b: *std.Build) void {
             "src/foo.c",
         },
         .flags = &.{
-            "-Wall",      // 开启所有警告
-            "-Wextra",    // 开启额外警告
-            "-std=c11",   // 使用 C11 标准
+            "-Wall", // 开启所有警告
+            "-Wextra", // 开启额外警告
+            "-std=c11", // 使用 C11 标准
         },
     });
 
@@ -47,4 +47,80 @@ pub fn build(b: *std.Build) void {
     // 创建 "zig build run" 步骤
     const run_step = b.step("run", "Run the application");
     run_step.dependOn(&run_cmd.step);
+
+    // ==========================================
+    // 2. 构建测试 (Zig 测试 C 代码)
+    // ==========================================
+    const lib_unit_tests = b.addTest(.{
+        .root_module = b.createModule(.{
+            .root_source_file = b.path("tests/test_leetcode.zig"),
+            .target = target,
+            .optimize = optimize,
+        }),
+    });
+
+    // 链接 LibC
+    lib_unit_tests.linkLibC();
+
+    // 添加头文件路径 (让 Zig 测试文件能 @cInclude)
+    lib_unit_tests.addIncludePath(b.path("include"));
+
+    // 添加被测试的 C 源文件 (leetcode.c)
+    // 这里使用单数 addCSourceFile，因为通常测试只需要链接特定的实现文件
+    lib_unit_tests.addCSourceFile(.{
+        .file = b.path("src/leetcode.c"),
+        .flags = &.{
+            "-std=c99",
+            "-Wall",
+        },
+    });
+
+    // ==========================================
+    // Test 命令配置
+    // ==========================================
+    const run_lib_unit_tests = b.addRunArtifact(lib_unit_tests);
+
+    const test_step = b.step("test", "Run unit tests");
+    test_step.dependOn(&run_lib_unit_tests.step);
+
+    // ==========================================
+    // 3. Rust 构建与测试
+    // ==========================================
+    const cargo_run = b.addSystemCommand(&.{ "cargo", "run" });
+    cargo_run.cwd = b.path("rust");
+
+    const cargo_build = b.addSystemCommand(&.{ "cargo", "build" });
+    cargo_build.cwd = b.path("rust");
+
+    const cargo_test = b.addSystemCommand(&.{ "cargo", "test" });
+    cargo_test.cwd = b.path("rust");
+
+    const rust_step = b.step("rust", "Build and test Rust code");
+    rust_step.dependOn(&cargo_run.step);
+    rust_step.dependOn(&cargo_build.step);
+    rust_step.dependOn(&cargo_test.step);
+
+    // 让标准 test 步骤也包含 Rust 测试
+    test_step.dependOn(&cargo_test.step);
+
+    // ==========================================
+    // 4. Go 构建与测试
+    // ==========================================
+    const go_build = b.addSystemCommand(&.{ "go", "build" });
+    go_build.cwd = b.path("go");
+
+    const go_test = b.addSystemCommand(&.{ "go", "test" });
+    go_test.cwd = b.path("go");
+
+    const go_step = b.step("go", "Build and test Go code");
+    go_step.dependOn(&go_build.step);
+    go_step.dependOn(&go_test.step);
+
+    // 让标准 test 步骤也包含 Go 测试
+    test_step.dependOn(&go_test.step);
+
+    // Check 步骤 (给 ZLS 用的)
+    const check_step = b.step("check", "Check compilation");
+    check_step.dependOn(&exe.step);
+    check_step.dependOn(&lib_unit_tests.step);
 }

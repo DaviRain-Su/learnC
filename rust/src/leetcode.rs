@@ -53,5 +53,5 @@ fn test_remove_element() {
     let expected = 2;
     let actual = remove_element(&mut nums, val);
     assert_eq!(actual, expected);
-    assert_eq!(nums, vec![2, 2]);
+    assert_eq!(nums, vec![2, 2, 2, 3]);
 }

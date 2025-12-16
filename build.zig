@@ -103,6 +103,22 @@ pub fn build(b: *std.Build) void {
     // 让标准 test 步骤也包含 Rust 测试
     test_step.dependOn(&cargo_test.step);
 
+    // ==========================================
+    // 4. Go 构建与测试
+    // ==========================================
+    const go_build = b.addSystemCommand(&.{ "go", "build" });
+    go_build.cwd = b.path("go");
+
+    const go_test = b.addSystemCommand(&.{ "go", "test" });
+    go_test.cwd = b.path("go");
+
+    const go_step = b.step("go", "Build and test Go code");
+    go_step.dependOn(&go_build.step);
+    go_step.dependOn(&go_test.step);
+
+    // 让标准 test 步骤也包含 Go 测试
+    test_step.dependOn(&go_test.step);
+
     // Check 步骤 (给 ZLS 用的)
     const check_step = b.step("check", "Check compilation");
     check_step.dependOn(&exe.step);

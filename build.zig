@@ -48,7 +48,43 @@ pub fn build(b: *std.Build) void {
     const run_step = b.step("run", "Run the application");
     run_step.dependOn(&run_cmd.step);
 
-    // 创建 "check" 步骤供 ZLS 使用 (用于头文件查找和语法检查)
+    // ==========================================
+    // 2. 构建测试 (Zig 测试 C 代码)
+    // ==========================================
+    const lib_unit_tests = b.addTest(.{
+        .root_module = b.createModule(.{
+            .root_source_file = b.path("tests/test_leetcode.zig"),
+            .target = target,
+            .optimize = optimize,
+        }),
+    });
+
+    // 链接 LibC
+    lib_unit_tests.linkLibC();
+
+    // 添加头文件路径 (让 Zig 测试文件能 @cInclude)
+    lib_unit_tests.addIncludePath(b.path("include"));
+
+    // 添加被测试的 C 源文件 (leetcode.c)
+    // 这里使用单数 addCSourceFile，因为通常测试只需要链接特定的实现文件
+    lib_unit_tests.addCSourceFile(.{
+        .file = b.path("src/leetcode.c"),
+        .flags = &.{
+            "-std=c99",
+            "-Wall",
+        },
+    });
+
+    // ==========================================
+    // Test 命令配置
+    // ==========================================
+    const run_lib_unit_tests = b.addRunArtifact(lib_unit_tests);
+
+    const test_step = b.step("test", "Run unit tests");
+    test_step.dependOn(&run_lib_unit_tests.step);
+
+    // Check 步骤 (给 ZLS 用的)
     const check_step = b.step("check", "Check compilation");
     check_step.dependOn(&exe.step);
+    check_step.dependOn(&lib_unit_tests.step);
 }

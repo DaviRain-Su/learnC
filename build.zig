@@ -83,6 +83,26 @@ pub fn build(b: *std.Build) void {
     const test_step = b.step("test", "Run unit tests");
     test_step.dependOn(&run_lib_unit_tests.step);
 
+    // ==========================================
+    // 3. Rust 构建与测试
+    // ==========================================
+    const cargo_run = b.addSystemCommand(&.{ "cargo", "run" });
+    cargo_run.cwd = b.path("rust");
+
+    const cargo_build = b.addSystemCommand(&.{ "cargo", "build" });
+    cargo_build.cwd = b.path("rust");
+
+    const cargo_test = b.addSystemCommand(&.{ "cargo", "test" });
+    cargo_test.cwd = b.path("rust");
+
+    const rust_step = b.step("rust", "Build and test Rust code");
+    rust_step.dependOn(&cargo_run.step);
+    rust_step.dependOn(&cargo_build.step);
+    rust_step.dependOn(&cargo_test.step);
+
+    // 让标准 test 步骤也包含 Rust 测试
+    test_step.dependOn(&cargo_test.step);
+
     // Check 步骤 (给 ZLS 用的)
     const check_step = b.step("check", "Check compilation");
     check_step.dependOn(&exe.step);

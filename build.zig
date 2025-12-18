@@ -10,6 +10,7 @@ pub fn build(b: *std.Build) void {
     const exe = b.addExecutable(.{
         .name = "hello",
         .root_module = b.createModule(.{
+            .root_source_file = b.path("src/main.zig"),
             .target = target,
             .optimize = optimize,
             .link_libc = true, // 链接 C 标准库
@@ -19,7 +20,6 @@ pub fn build(b: *std.Build) void {
     // 添加 C 源文件
     exe.addCSourceFiles(.{
         .files = &.{
-            "src/main.c",
             "src/foo.c",
         },
         .flags = &.{

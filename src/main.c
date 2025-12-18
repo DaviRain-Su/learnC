@@ -1,16 +1,12 @@
 #include <stdio.h>
+#include "foo.h"
 
+#define IN 1
+#define OUT 0
 
 int main() {
-    int nc = 0;
-    int nl = 0;
-    for(int c = 0; c != EOF; nc += 1) {
-        if (c == '\n') {
-            nl += 1;
-        }
-        c = getchar();
+    for (int i = 0; i < 10; i += 1) {
+        printf("%3d %3d %3d\n", i, power(2, i), power(-3, i));
     }
-    printf("\nINPUT NUMBERIS: %d\n", nc);
-    printf("\nINPUT LINEIS: %d\n", nl);
     return 0;
 }
